@@ -18,3 +18,4 @@
 3. Optimize docker image building process (the tests image is huge comparing to what it should be)
 4. Proper documentation (about db and it's schema and rest)
 5. Tests are not removing produced data, but it would be nice to do so using fixtures
+6. Pre-commit hooks for code style 
