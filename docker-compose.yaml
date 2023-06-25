@@ -1,0 +1,59 @@
+version: "3.6"
+services:
+  postgres_db:
+    hostname: postgres_db
+    image: postgres:14.5-alpine
+    container_name: postgres_db
+    restart: always
+    networks:
+      - orders_network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/pgdata
+    environment:
+      - POSTGRES_USER=orders_server
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=orders
+      - PGDATA=/var/lib/postgresql/data/pgdata
+
+  backend:
+    build:
+      context: .
+      dockerfile: ./dockerfile
+      target: backend
+    hostname: backend
+    container_name: orders_server_backend
+    volumes:
+      - migrations:/automation/app/migrations/database/versions
+    restart: always
+    ports:
+      - "5000:5000"
+    networks:
+      - orders_network
+    healthcheck: # DO we really need a healthcheck?
+      test: [ "CMD-SHELL", "curl --silent --fail localhost:5000/healthcheck || exit 1" ]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+    depends_on:
+      - postgres_db
+  tests:
+    build:
+      context: .
+      dockerfile: ./dockerfile
+      target: tests
+    restart: always
+    hostname: tests
+    container_name: orders_server_tests
+    ports:
+      - "8000:8000"
+    networks:
+      - orders_network
+    depends_on:
+      - backend
+networks:
+  orders_network:
+volumes:
+  migrations:
+    driver: local
+  postgres_data:
+    driver: local

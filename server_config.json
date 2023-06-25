@@ -1,0 +1,9 @@
+{
+  "postgres": {
+    "host": "postgres_db",
+    "port": "5432",
+    "user": "orders_server",
+    "password": "admin",
+    "database": "orders"
+  }
+}
